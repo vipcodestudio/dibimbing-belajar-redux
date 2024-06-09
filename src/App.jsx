@@ -1,8 +1,6 @@
 // import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import './App.css';
-import { useEffect } from 'react';
-import { fetchProduct } from './redux/slices/productSlice';
+import { useQuery } from '@tanstack/react-query';
 // import axios from 'axios';
 
 function App() {
@@ -19,15 +17,21 @@ function App() {
 
   // console.log(products);
 
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch(fetchProduct());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(fetchProduct());
+  // }, [dispatch]);
 
-  const products = useSelector((state) => state.product.products);
-  const isLoading = useSelector((state) => state.product.isLoading);
-  const error = useSelector((state) => state.product.error);
+  // const products = useSelector((state) => state.product.products);
+  // const isLoading = useSelector((state) => state.product.isLoading);
+  // const error = useSelector((state) => state.product.error);
+
+  const { error, data, isLoading, refetch } = useQuery({
+    queryKey: ['productData'],
+    queryFn: () =>
+      fetch('https://fakestoreapi.com/products').then((res) => res.json()),
+  });
 
   if (isLoading) {
     return (
@@ -48,11 +52,13 @@ function App() {
   return (
     <>
       <div>
-        {products.map((product) => (
+        {data.map((product) => (
           <div key={product.id}>
             <p>{product.title}</p>
           </div>
         ))}
+
+        <button onClick={() => refetch()}>refetch</button>
       </div>
     </>
   );
